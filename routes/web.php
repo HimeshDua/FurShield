@@ -12,13 +12,12 @@ use App\Http\Controllers\ShelterProfileController;
 use Inertia\Inertia;
 
 
+Route::get('/', function () {
+    return Inertia::render('Public/Home');
+});
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
-
-
-Route::get('/', function () {
-    return Inertia::render('Home');
-});
 
 Route::middleware(['auth'])->group(function () {
 

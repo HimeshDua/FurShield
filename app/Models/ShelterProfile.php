@@ -4,14 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class VetProfile extends Model
+class ShelterProfile extends Model
 {
-    protected $fillable = ['user_id', 'specializations', 'qualifications', 'availability', 'consultation_fee', 'clinic_address'];
-
-    protected $casts = [
-        'specializations' => 'array',
-        'availability' => 'array',
-    ];
+    protected $fillable = ['user_id', 'location', 'mission', 'contact_email'];
 
     public function user()
     {
