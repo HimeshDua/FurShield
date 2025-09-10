@@ -2,47 +2,78 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
+        'phone',
+        'address',
+        'avatar',
+        'bio'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = ['email_verified_at' => 'datetime'];
+
+    // helpers
+    public function isVet()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->role === 'vet';
+    }
+    public function isOwner()
+    {
+        return $this->role === 'owner';
+    }
+    public function isShelter()
+    {
+        return $this->role === 'shelter';
+    }
+
+    // relationships
+    public function pets()
+    {
+        return $this->hasMany(Pet::class, 'owner_id');
+    }
+
+    public function vetProfile()
+    {
+        return $this->hasOne(VetProfile::class);
+    }
+
+    public function shelterProfile()
+    {
+        return $this->hasOne(ShelterProfile::class);
+    }
+
+    public function appointmentsAsVet()
+    {
+        return $this->hasMany(Appointment::class, 'vet_id');
+    }
+
+    public function appointmentsAsOwner()
+    {
+        return $this->hasMany(Appointment::class, 'owner_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'owner_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

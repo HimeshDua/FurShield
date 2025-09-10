@@ -1,42 +1,40 @@
-import { InertiaLinkProps } from '@inertiajs/react';
-import { LucideIcon } from 'lucide-react';
-
-export interface Auth {
-    user: User;
-}
-
-export interface BreadcrumbItem {
-    title: string;
-    href: string;
-}
-
-export interface NavGroup {
-    title: string;
-    items: NavItem[];
-}
-
-export interface NavItem {
-    title: string;
-    href: NonNullable<InertiaLinkProps['href']>;
-    icon?: LucideIcon | null;
-    isActive?: boolean;
-}
-
-export interface SharedData {
-    name: string;
-    quote: { message: string; author: string };
-    auth: Auth;
-    sidebarOpen: boolean;
-    [key: string]: unknown;
-}
+import { PageProps as InertiaPageProps } from '@inertiajs/inertia';
+import { Config } from 'ziggy-js';
 
 export interface User {
     id: number;
     name: string;
     email: string;
-    avatar?: string;
-    email_verified_at: string | null;
-    created_at: string;
-    updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    email_verified_at?: string;
+}
+
+export interface PageProps extends InertiaPageProps {
+    ziggy: Config & { location: string };
+    auth: {
+        user?: User | null;
+    };
+    vendor: VendorService;
+    seo: Seo[];
+    customerServices: VendorService[];
+    subsByService: CustomerSubscription[];
+    flash: { success?: string; error?: string };
+    CmsProp: Cms[] | undefined;
+    cms: CmsYes;
+    marquee: [
+        {
+            marquee_text: string;
+            marquee_link: string;
+        },
+    ];
+    [key: string]: any;
+}
+
+export interface SharedData {
+    name: string;
+    isRequestSend?: { id: string }[];
+    quote: { message: string; author: string };
+    auth: Auth;
+    ziggy: Config & { location: string };
+    sidebarOpen: boolean;
+    [key: string]: unknown;
 }
