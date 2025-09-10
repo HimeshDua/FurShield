@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import Layout from '@/layouts/layout';
+import Layout from '@/Layouts/layout';
 import { LayoutProps, PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 

@@ -20,15 +20,15 @@ function Layout({ children, title }: LayoutProps) {
     return (
         <>
             {auth.user && auth.user.email.length > 0 && <Banner className="bg-gradient-to-b from-blue-500 to-blue-600" />}
-            <main className="relative mx-auto max-w-6xl">
-                <Head title={title} />
-                <Navbar auth={auth} />
-                <Section className="min-h-[64vh]">
-                    {children}
-                    <Toaster position="bottom-right" />
-                </Section>
-                <FooterWithNewsletter />
-            </main>
+            {/* <main className="relative mx-auto max-w-7   xl"> */}
+            <Head title={title} />
+            <Navbar auth={auth} />
+            <Section className="min-h-[64vh]">
+                {children}
+                <Toaster position="bottom-right" />
+            </Section>
+            <FooterWithNewsletter />
+            {/* </main>  */}
         </>
     );
 }

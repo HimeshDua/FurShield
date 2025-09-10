@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AuthLayout from '@/layouts/auth-layout';
+import Layout from '@/Layouts/layout';
 import { PawPrint } from 'lucide-react';
 import { useSonner } from 'sonner';
 
@@ -49,9 +51,8 @@ const Login = () => {
     };
 
     return (
-        <>
-            <Head title="Login" />
-            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 p-4">
+        <Layout title="Login">
+            <AuthLayout title="Log in to your account" description="Access your dashboard and manage your ISP from a single place.">
                 <Card className="shadow-glow w-full max-w-md">
                     <CardHeader className="text-center">
                         <div className="mb-4 flex justify-center">
@@ -130,8 +131,8 @@ const Login = () => {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
-        </>
+            </AuthLayout>
+        </Layout>
     );
 };
 

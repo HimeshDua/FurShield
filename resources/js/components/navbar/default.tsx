@@ -1,46 +1,14 @@
-import { Menu } from 'lucide-react';
-import { ReactNode } from 'react';
-
-import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-import { Navbar as NavbarComponent, NavbarLeft, NavbarRight } from '../ui/navbar';
-
 import { siteConfig } from '@/config/site';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { cn } from '@/lib/utils';
 import { ButtonVariants } from '@/types';
 import { Link, router } from '@inertiajs/react';
+import { Menu } from 'lucide-react';
+import { ReactNode } from 'react';
+import { Button } from '../ui/button';
+import { Navbar as NavbarComponent, NavbarLeft, NavbarRight } from '../ui/navbar';
 import Navigation from '../ui/navigation';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
-
-interface NavbarLink {
-    text: string;
-    href: string;
-}
-
-interface NavbarActionProps {
-    text: string;
-    href: string;
-    variant?: ButtonVariants;
-    icon?: ReactNode;
-    iconRight?: ReactNode;
-    isButton?: boolean;
-}
-
-interface NavbarProps {
-    logo?: ReactNode;
-    name?: string;
-    homeUrl?: string;
-    auth?: {
-        user?: {
-            name: string;
-            role: 'admin' | 'vendor' | 'customer' | null;
-        } | null;
-    };
-    actions?: NavbarActionProps[];
-    showNavigation?: boolean;
-    customNavigation?: ReactNode;
-    className?: string;
-}
 
 interface NavbarLink {
     text: string;
@@ -65,7 +33,7 @@ interface NavbarProps {
     auth?: {
         user?: {
             name: string;
-            role: 'admin' | 'vendor' | 'customer' | null;
+            role: 'owner' | 'vet' | 'shelter' | null;
         } | null;
     };
     showNavigation?: boolean;
@@ -75,7 +43,7 @@ interface NavbarProps {
 
 export default function Navbar({
     logo = '',
-    name = 'FurShiled',
+    name = 'FurShield',
     homeUrl = siteConfig.url,
     auth,
     showNavigation = true,
@@ -87,97 +55,48 @@ export default function Navbar({
 
     if (auth?.user) {
         switch (auth.user.role) {
-            case 'admin':
+            case 'owner':
                 roleBasedLinks = [
-                    { text: 'Dashboard', href: '/admin/dashboard' },
-                    { text: 'Users', href: '/admin/users' },
-                    // { text: 'Plans', href: '/admin/plans' },
-                    { text: 'Billing', href: '/admin/billing' },
-                    { text: 'CMS', href: '/admin/cms' },
+                    { text: 'My Pets', href: '/pets' },
+                    { text: 'Health Records', href: '/pets/1/health' }, // dynamic, just show base in menu
+                    { text: 'Appointments', href: '/appointments' }, // booking flow
+                    { text: 'Orders', href: '/orders' },
                 ];
                 break;
 
-            case 'vendor':
+            case 'vet':
                 roleBasedLinks = [
-                    { text: 'Dashboard', href: '/vendor/dashboard' },
-                    { text: 'Assigned', href: '/vendor/assigned-connections' },
-                    { text: 'Requests', href: '/vendor/installation-requests' },
-                    { text: 'Conversations', href: '/vendor/conversations' },
+                    { text: 'Appointments', href: '/vet/appointments' },
+                    { text: 'Health Records', href: '/health-records' },
+                    { text: 'My Profile', href: '/vet-profile' },
                 ];
                 break;
 
-            case 'customer':
+            case 'shelter':
                 roleBasedLinks = [
-                    { text: 'Dashboard', href: '/customer/dashboard' },
-                    { text: 'Services', href: '/services' },
-                    { text: 'Support', href: '/support' },
-                    { text: 'Billings', href: '/customer/billing' },
-                    { text: 'Subscription ', href: '/customer/subscription-management' },
-                    // { text: 'Support', href: '/customer/support' },
-                ];
-                break;
-        }
-
-        switch (auth.user.role) {
-            case 'admin':
-                actions = [
-                    {
-                        text: 'Dashboard',
-                        href: '/admin/dashboard',
-                        isButton: true,
-                        variant: 'secondary',
-                    },
-                    {
-                        text: 'Logout',
-                        href: '/logout',
-                        isForm: true,
-                        isButton: true,
-                        variant: 'destructive',
-                    },
+                    { text: 'Adoptions', href: '/adoptions' },
+                    { text: 'My Profile', href: '/shelter-profile' },
                 ];
                 break;
 
-            case 'vendor':
-                actions = [
-                    {
-                        text: 'Profile',
-                        href: '/settings/profile',
-                        isButton: true,
-                        variant: 'secondary',
-                    },
-                    {
-                        text: 'Dashboard',
-                        href: '/dashboard',
-                        isButton: true,
-                        variant: 'default',
-                    },
+            default:
+                roleBasedLinks = [
+                    { text: 'Home', href: '/' },
+                    { text: 'Products', href: '/products' },
+                    { text: 'Vets', href: '/vets' },
+                    { text: 'Adoptions', href: '/adoptions' },
                 ];
-                break;
-
-            case 'customer':
-                actions = [
-                    {
-                        text: 'Profile',
-                        href: '/settings/profile',
-                        isProfile: true,
-                        isButton: true,
-                        variant: 'default',
-                    },
-                ];
-                break;
         }
     } else {
         // Guest
         roleBasedLinks = [
             { text: 'Home', href: '/' },
-            // { text: 'Plans', href: '/plans' },
             { text: 'Services', href: '/services' },
             { text: 'About', href: '/about' },
             { text: 'Contact', href: '/contact' },
         ];
-
         actions = [
-            { text: 'Sign In', href: '/login', isButton: false },
+            { text: 'Sign In', href: '/login' },
             {
                 text: 'Get Started',
                 href: '/register',
@@ -190,42 +109,32 @@ export default function Navbar({
     const cleanup = useMobileNavigation();
     const handleLogout = () => {
         cleanup();
-        router.flushAll();
+        router.post(route('logout'));
     };
 
     return (
-        <header className={cn('z-50 -mb-4 px-4 pb-4', 'fade-bottom bg-background/80 backdrop-blur-lg', className)}>
+        <header className={cn('z-50 container -mb-4 px-4 pb-4', 'fade-bottom bg-background/80 backdrop-blur-lg', className)}>
             <div className="max-w-container relative mx-auto">
                 <NavbarComponent>
                     <NavbarLeft>
-                        <a href={homeUrl} className="flex items-center gap-2 text-xl font-bold">
+                        <Link href={homeUrl} className="flex items-center gap-2 text-xl font-bold">
                             {logo}
                             {name}
-                        </a>
+                        </Link>
                         {showNavigation && (customNavigation || <Navigation />)}
                     </NavbarLeft>
                     <NavbarRight>
                         {actions.map((action, index) =>
                             action.isProfile && action.isButton ? (
-                                <Button key={index} variant={action.variant || 'default'} className="text-center" asChild>
+                                <Button key={index} variant={action.variant || 'default'} asChild>
                                     <Link href={action.href}>{action.text}</Link>
                                 </Button>
                             ) : action.isForm && action.isButton ? (
-                                <Link
-                                    className={cn(
-                                        "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                                        'h-9 px-4 py-2 has-[>svg]:px-3',
-                                        'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
-                                    )}
-                                    method="post"
-                                    href={route('logout')}
-                                    as="button"
-                                    onClick={handleLogout}
-                                >
-                                    Log out
-                                </Link>
+                                <Button key={index} variant={action.variant || 'destructive'} onClick={handleLogout}>
+                                    {action.text}
+                                </Button>
                             ) : action.isButton ? (
-                                <Button key={index} variant={action.variant || 'default'} className="text-center" asChild>
+                                <Button key={index} variant={action.variant || 'default'} asChild>
                                     <Link href={action.href}>
                                         {action.icon}
                                         {action.text}

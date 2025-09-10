@@ -1,12 +1,13 @@
 import heroImage from '@/assets/hero-pets.jpg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import Layout from '@/Layouts/layout';
 import { Link } from '@inertiajs/react';
 import { Heart, Home as HomeIcon, Shield, ShoppingBag, Stethoscope } from 'lucide-react';
 
 export default function Home() {
     return (
-        <div className="min-h-screen bg-background">
+        <Layout title="Home">
             {/* Hero Section */}
             <section className="relative overflow-hidden">
                 <div className="gradient-hero absolute inset-0 opacity-10" />
@@ -135,6 +136,6 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-        </div>
+        </Layout>
     );
 }
