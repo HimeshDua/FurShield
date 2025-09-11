@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Layout from '@/Layouts/layout';
+import Layout from '@/layouts/layout';
 import { Link, useForm } from '@inertiajs/react';
 import { PawPrint } from 'lucide-react';
 

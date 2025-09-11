@@ -7,6 +7,7 @@ use App\Models\PetImage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Gate;
 
 class PetController extends Controller
 {
@@ -16,14 +17,14 @@ class PetController extends Controller
         $user = $request->user();
         $pets = $user->pets()->with('images')->paginate(12);
 
-        return Inertia::render('Pets/Index', [
-            'pets' => $pets,
+        return Inertia::render('Owner/Pets/Index', [
+            'pet' => $pets ?? [],
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Pets/Create');
+        return Inertia::render('Owner/Pets/Create');
     }
 
     public function store(Request $request)
@@ -53,29 +54,29 @@ class PetController extends Controller
             }
         }
 
-        return redirect()->route('pets.index')->with('success', 'Pet added.');
+        return redirect()->route('owner.pets.index')->with('success', 'Pet added.');
     }
 
     public function show(Pet $pet)
     {
-        $this->authorize('view', $pet);
+        Gate::authorize('view', $pet);
 
         $pet->load(['images', 'healthRecords', 'appointments']);
 
-        return Inertia::render('Pets/Show', [
+        return Inertia::render('Owner/Pets/Show', [
             'pet' => $pet
         ]);
     }
 
     public function edit(Pet $pet)
     {
-        $this->authorize('update', $pet);
-        return Inertia::render('Pets/Edit', ['pet' => $pet]);
+        Gate::authorize('update', $pet);
+        return Inertia::render('Owner/Pets/Edit', ['pet' => $pet]);
     }
 
     public function update(Request $request, Pet $pet)
     {
-        $this->authorize('update', $pet);
+        Gate::authorize('update', $pet);
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -90,14 +91,14 @@ class PetController extends Controller
 
         $pet->update($data);
 
-        return redirect()->route('pets.show', $pet)->with('success', 'Pet updated.');
+        return redirect()->route('owner.pets.show', $pet)->with('success', 'Pet updated.');
     }
 
     public function destroy(Pet $pet)
     {
-        $this->authorize('delete', $pet);
+        Gate::authorize('delete', $pet);
         $pet->delete();
 
-        return redirect()->route('pets.index')->with('success', 'Pet removed.');
+        return redirect()->route('owner.pets.index')->with('success', 'Pet removed.');
     }
 }

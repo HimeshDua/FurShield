@@ -33,14 +33,14 @@ class VetProfileController extends Controller
     public function showOwn(Request $request)
     {
         $vet = $request->user();
-        $this->authorize('view', $vet);
+        Gate::authorize('view', $vet);
         $vet->load('vetProfile');
         return Inertia::render('Vets/Profile', ['vet' => $vet]);
     }
 
     public function update(Request $request, VetProfile $vetProfile)
     {
-        $this->authorize('update', $vetProfile);
+        Gate::authorize('update', $vetProfile);
 
         $data = $request->validate([
             'specializations' => 'nullable|array',

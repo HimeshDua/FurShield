@@ -4,7 +4,7 @@ import { AppLayoutProps } from '@/types';
 import { Head } from '@inertiajs/react';
 
 export default ({ children, title, breadcrumbs, ...props }: AppLayoutProps) => (
-    <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
+    <AppLayoutTemplate>
         <Head title={title} />
         {children}
         <Toaster position="bottom-right" />

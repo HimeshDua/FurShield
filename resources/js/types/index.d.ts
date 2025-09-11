@@ -1,7 +1,5 @@
 import { PageProps as InertiaPageProps } from '@inertiajs/inertia';
-import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
-import { Cms, CmsYes, Seo } from './cms';
 
 //Layouts
 export interface LayoutProps {
@@ -61,134 +59,122 @@ export interface User {
     [key: string]: unknown;
 }
 
+//Layouts
+export interface LayoutProps {
+    children: ReactNode;
+    title: string;
+    // role?: 'customer' | 'vendor' | 'admin' | null;
+    breadcrumbs?: BreadcrumbItem[];
+    [type: string]: value;
+}
+
+export interface AppLayoutProps {
+    children: ReactNode;
+    title?: string;
+    breadcrumbs?: BreadcrumbItem[];
+}
+
+export interface Auth {
+    user: User | null;
+}
+
+// ---------- Domain Entities ----------
+
+// Pets
+export interface Pet {
+    id: number;
+    name: string;
+    species: string;
+    breed?: string;
+    age?: number;
+    owner_id: number;
+    created_at: string;
+    updated_at: string;
+    [key: string]: any;
+}
+
+export interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    stock?: number;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+
+    // links: {
+    //     url: string | null;
+    //     label: string;
+    //     active: boolean;
+    // }[];
+    // onPageChange: (url: string | null) => void;
+}
+
+export interface HealthRecord {
+    id: number;
+    pet_id: number;
+    vet_id: number;
+    description: string;
+    diagnosis: string;
+    treatment: string;
+    created_at: string;
+    updated_at: string;
+}
+
+// Appointments
+export interface Appointment {
+    id: number;
+    pet_id: number;
+    vet_id: number;
+    date: string;
+    status: 'pending' | 'approved' | 'rejected';
+    created_at: string;
+    updated_at: string;
+    [key: string]: any;
+}
+
+export interface SharedData {
+    name: string;
+    isRequestSend?: { id: string }[];
+    quote: { message: string; author: string };
+    auth: Auth;
+    ziggy: Config & { location: string };
+    sidebarOpen: boolean;
+    [key: string]: unknown;
+}
+
+export interface ShelterProfile {
+    id: number;
+    user_id: number;
+    name: string;
+    description: string;
+    location: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface PageProps extends InertiaPageProps {
     auth: {
         user?: User | null;
     };
-    vendor: VendorService;
-    seo: Seo[];
-    customerServices: VendorService[];
-    subsByService: CustomerSubscription[];
     flash: { success?: string; error?: string };
-    CmsProp: Cms[] | undefined;
-    cms: CmsYes;
-    marquee: [
-        {
-            marquee_text: string;
-            marquee_link: string;
-        },
-    ];
+    auth: Auth;
+    product: Product;
+    appointment: Appointment;
+    pet: Pet;
     [key: string]: any;
 }
 
-// Vendors
+// ---------- Inertia Page Props ----------
 
-export interface Vendor {
-    question: string;
-    answer: string;
+// Every Inertia page gets this base
+export interface PageProps<T = Record<string, unknown>> extends InertiaPageProps {
+    auth: Auth;
+    flash?: {
+        success?: string;
+        error?: string;
+    };
+    // page-specific props
+    data?: T;
 }
-
-export type ConnectionType = 'fiber' | 'dsl' | 'wireless';
-export type HighlightType = 'new' | 'trending' | 'reliable' | 'popular' | 'undefined';
-
-type PackageName = 'Basic' | 'Standard' | 'Premium';
-type BillingCycle = 'Monthly' | 'Quarterly' | 'Yearly';
-
-type FaqItem = { question: string; answer: string };
-
-export interface PackageForm {
-    name: PackageName;
-    price: number;
-    billing_cycle: BillingCycle;
-    speed_label?: string;
-    features: string[];
-    description?: string;
-    currency: string;
-    is_popular?: boolean;
-}
-
-export type VendorService = {
-    id: number;
-    user_id: number;
-
-    title: string;
-    slug: string;
-    city: string;
-    location: string;
-    posted_date: string;
-    connection_type: ConnectionType;
-    highlight: HighlightType;
-
-    short_description: string;
-    full_description: string;
-
-    packages: PackageForm[];
-
-    features: string[];
-    faqs: { question: string; answer: string }[];
-    images: File[];
-
-    speed_details: string[];
-    coverage_area: string;
-    is_active: boolean;
-
-    created_at: string;
-    updated_at: string;
-
-    [key: string]: unknown;
-};
-
-// Vendor Service Form
-export type VendorServiceFormData = {
-    title: string;
-    slug: string;
-    city: string;
-    location: string;
-    posted_date: string;
-    connection_type: 'fiber' | 'dsl' | 'wireless';
-    highlight: 'new' | 'trending' | 'reliable' | 'popular' | 'undefined';
-    short_description: string;
-    full_description: string;
-    featuresStr: string;
-    speedDetailsStr: string;
-    packages: PackageForm[];
-    faqs: FaqItem[];
-    images: File[];
-    coverage_area: string;
-    is_active: boolean;
-};
-
-// User Transactions
-
-export interface UserTransaction {
-    customer_subscription_id: string;
-    amount: number;
-    currency: string;
-    payment_date: Date;
-    payment_method?: string;
-    transaction_reference?: string;
-    status: 'pending' | 'completed' | 'failed' | 'refunded';
-
-    created_at: string;
-    updated_at: string;
-
-    [key: string]: unknown;
-}
-
-// Customer Subscription
-export interface CustomerSubscription {
-    user_id: string;
-    vendor_service_id: string;
-    subscribed_at: Date;
-    next_billing_date: Date;
-    package_name: ['Basic' | 'Standard' | 'Premium'];
-    status: ['active' | 'cancelled' | 'expired'];
-
-    created_at: string;
-    updated_at: string;
-
-    [key: string]: unknown;
-}
-
-// Button varaints
-export type ButtonVariants = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';

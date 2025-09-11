@@ -7,68 +7,107 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use DB;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    use AuthorizesRequests;
+    public function __construct()
+    {
+        Gate::middleware('auth');
+    }
+
+    /**
+     * List owner's orders
+     */
     public function index(Request $request)
     {
-        $orders = $request->user()->orders()->with('items.product')->paginate(12);
-        return Inertia::render('Orders/Index', ['orders' => $orders]);
+        $orders = Order::where('owner_id', $request->user()->id)
+            ->withCount('items')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return Inertia::render('Owner/Orders/Index', [
+            'orders' => $orders,
+        ]);
     }
 
-    public function show(Order $order)
+    /**
+     * Show order details
+     */
+    public function show(Request $request, Order $order)
     {
-        $this->authorize('view', $order);
+        Gate::authorize('view', $order);
+
         $order->load('items.product');
-        return Inertia::render('Orders/Show', ['order' => $order]);
+
+        return Inertia::render('Owner/Orders/Show', [
+            'order' => $order,
+        ]);
     }
 
-    // simple cart->order creation for hackathon (no payment)
+    /**
+     * Create a demo order. Accepts payload: items => [{product_id, quantity}]
+     */
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1'
+            'items.*.product_id' => 'required|integer|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
         ]);
+
+        $user = $request->user();
 
         DB::beginTransaction();
         try {
             $total = 0;
             $order = Order::create([
-                'owner_id' => $request->user()->id,
+                'owner_id' => $user->id,
                 'total_amount' => 0,
                 'status' => 'processing',
             ]);
 
-            foreach ($data['items'] as $it) {
-                $product = Product::findOrFail($it['product_id']);
-                $qty = $it['quantity'];
-                $price = $product->price;
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => $qty,
-                    'price_each' => $price
-                ]);
-                $total += $price * $qty;
+            foreach ($validated['items'] as $item) {
+                $product = Product::lockForUpdate()->find($item['product_id']);
 
-                // optionally reduce stock
-                if ($product->stock_quantity > 0) {
-                    $product->decrement('stock_quantity', $qty);
+                if (!$product) {
+                    throw new \Exception("Product not found: {$item['product_id']}");
                 }
+
+                // if stock is maintained, reduce it; allow backorders if you prefer
+                if (!is_null($product->stock_quantity) && $product->stock_quantity < $item['quantity']) {
+                    throw new \Exception("Insufficient stock for product: {$product->name}");
+                }
+
+                // decrement stock safely
+                if (!is_null($product->stock_quantity)) {
+                    $product->decrement('stock_quantity', $item['quantity']);
+                }
+
+                $priceEach = $product->price;
+                $lineTotal = $priceEach * $item['quantity'];
+                $total += $lineTotal;
+
+                $order->items()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $item['quantity'],
+                    'price_each' => $priceEach,
+                ]);
             }
 
-            $order->update(['total_amount' => $total]);
+            $order->total_amount = $total;
+            $order->save();
+
             DB::commit();
+
+            return redirect()->route('owner.orders.show', $order->id)
+                ->with('success', 'Order created (demo).');
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
+            Log::error('Order creation failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to create order: ' . $e->getMessage());
         }
-
-        return redirect()->route('orders.show', $order)->with('success', 'Order placed (demo).');
     }
 }

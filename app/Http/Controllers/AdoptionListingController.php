@@ -23,7 +23,7 @@ class AdoptionListingController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', AdoptionListing::class);
+        Gate::authorize('create', AdoptionListing::class);
 
         $data = $request->validate([
             'pet_name' => 'required|string|max:255',
@@ -46,13 +46,13 @@ class AdoptionListingController extends Controller
 
     public function edit(AdoptionListing $adoption)
     {
-        $this->authorize('update', $adoption);
+        Gate::authorize('update', $adoption);
         return Inertia::render('Adoptions/Edit', ['listing' => $adoption]);
     }
 
     public function update(Request $request, AdoptionListing $adoption)
     {
-        $this->authorize('update', $adoption);
+        Gate::authorize('update', $adoption);
 
         $data = $request->validate([
             'pet_name' => 'required|string|max:255',
@@ -70,7 +70,7 @@ class AdoptionListingController extends Controller
 
     public function destroy(AdoptionListing $adoption)
     {
-        $this->authorize('delete', $adoption);
+        Gate::authorize('delete', $adoption);
         $adoption->delete();
         return redirect()->route('adoptions.index')->with('success', 'Listing removed.');
     }

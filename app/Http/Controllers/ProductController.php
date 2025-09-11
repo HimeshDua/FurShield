@@ -30,7 +30,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', Product::class);
+        Gate::authorize('create', Product::class);
 
         $data = $request->validate([
             'name' => 'required|string|max:255',

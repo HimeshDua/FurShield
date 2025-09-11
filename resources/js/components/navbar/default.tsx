@@ -1,7 +1,6 @@
 import { siteConfig } from '@/config/site';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { cn } from '@/lib/utils';
-import { ButtonVariants } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { Menu } from 'lucide-react';
 import { ReactNode } from 'react';
@@ -18,7 +17,7 @@ interface NavbarLink {
 interface NavbarActionProps {
     text: string;
     href: string;
-    variant?: ButtonVariants;
+    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
     icon?: ReactNode;
     iconRight?: ReactNode;
     isForm?: boolean;
@@ -124,6 +123,11 @@ export default function Navbar({
                         {showNavigation && (customNavigation || <Navigation />)}
                     </NavbarLeft>
                     <NavbarRight>
+                        {roleBasedLinks.map((link, index) => (
+                            <Link key={index} href={link.href} className="text-muted-foreground hover:text-foreground">
+                                {link.text}
+                            </Link>
+                        ))}
                         {actions.map((action, index) =>
                             action.isProfile && action.isButton ? (
                                 <Button key={index} variant={action.variant || 'default'} asChild>

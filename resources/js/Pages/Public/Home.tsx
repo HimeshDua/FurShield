@@ -1,7 +1,7 @@
 import heroImage from '@/assets/hero-pets.jpg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import Layout from '@/Layouts/layout';
+import Layout from '@/layouts/layout';
 import { Link } from '@inertiajs/react';
 import { Heart, Home as HomeIcon, Shield, ShoppingBag, Stethoscope } from 'lucide-react';
 

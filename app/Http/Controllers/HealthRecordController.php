@@ -7,88 +7,155 @@ use App\Models\Pet;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class HealthRecordController extends Controller
 {
-    use AuthorizesRequests;
+    public function __construct()
+    {
+        Gate::middleware('auth');
+    }
+
+    /**
+     * Owner: list health records for a given pet (timeline).
+     */
     public function indexForPet(Request $request, Pet $pet)
     {
-        $this->authorize('viewAny', [HealthRecord::class, $pet]);
+        // ensure owner owns the pet
+        Gate::authorize('view', $pet);
 
-        $records = $pet->healthRecords()->with('vet')->latest()->paginate(12);
+        $records = HealthRecord::where('pet_id', $pet->id)
+            ->with('vet')
+            ->orderBy('visit_date', 'desc')
+            ->paginate(20);
 
-        return Inertia::render('Pets/Health/Index', [
+        return Inertia::render('Owner/Pets/Health/Index', [
             'pet' => $pet,
             'records' => $records,
         ]);
     }
 
+    /**
+     * Vet: store a new health record (vet-only route)
+     */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'pet_id' => 'required|exists:pets,id',
-            'visit_date' => 'nullable|date',
-            'title' => 'nullable|string|max:255',
-            'diagnosis' => 'nullable|string',
-            'treatment' => 'nullable|string',
-            'attachments.*' => 'nullable|file|max:8192'
+        Gate::authorize('create', HealthRecord::class);
+
+        $validated = $request->validate([
+            'pet_id' => 'required|integer|exists:pets,id',
+            'visit_date' => 'required|date',
+            'title' => 'nullable|string|max:191',
+            'diagnosis' => 'nullable|string|max:2000',
+            'treatment' => 'nullable|string|max:4000',
+            'attachments.*' => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:8192',
         ]);
 
-        $pet = Pet::findOrFail($data['pet_id']);
-        $this->authorize('create', [HealthRecord::class, $pet]);
+        DB::beginTransaction();
+        try {
+            $record = HealthRecord::create([
+                'pet_id' => $validated['pet_id'],
+                'vet_id' => $request->user()->id,
+                'visit_date' => $validated['visit_date'],
+                'title' => $validated['title'] ?? null,
+                'diagnosis' => $validated['diagnosis'] ?? null,
+                'treatment' => $validated['treatment'] ?? null,
+            ]);
 
-        $attachments = [];
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $attachments[] = $file->store('health_records', 'public');
+            if ($request->hasFile('attachments')) {
+                $paths = [];
+                foreach ($request->file('attachments') as $file) {
+                    $paths[] = $file->store('health-records', 'public');
+                }
+                // store as JSON array in a attachments text field (or related model)
+                $record->attachments = $paths;
+                $record->save();
             }
+
+            DB::commit();
+
+            return back()->with('success', 'Health record added.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Health record store failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to save health record.');
         }
-
-        $record = HealthRecord::create([
-            'pet_id' => $pet->id,
-            'vet_id' => $request->user()->isVet() ? $request->user()->id : null,
-            'visit_date' => $data['visit_date'] ?? now(),
-            'title' => $data['title'] ?? null,
-            'diagnosis' => $data['diagnosis'] ?? null,
-            'treatment' => $data['treatment'] ?? null,
-            'attachments' => $attachments,
-        ]);
-
-        return redirect()->back()->with('success', 'Health record saved.');
     }
 
+    /**
+     * Vet: update a health record
+     */
     public function update(Request $request, HealthRecord $healthRecord)
     {
-        $this->authorize('update', $healthRecord);
+        Gate::authorize('update', $healthRecord);
 
-        $data = $request->validate([
+        $validated = $request->validate([
             'visit_date' => 'nullable|date',
-            'title' => 'nullable|string|max:255',
-            'diagnosis' => 'nullable|string',
-            'treatment' => 'nullable|string',
-            'attachments.*' => 'nullable|file|max:8192'
+            'title' => 'nullable|string|max:191',
+            'diagnosis' => 'nullable|string|max:2000',
+            'treatment' => 'nullable|string|max:4000',
+            'attachments.*' => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:8192',
+            'remove_attachments' => 'nullable|array',
         ]);
 
-        $attachments = $healthRecord->attachments ?? [];
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $attachments[] = $file->store('health_records', 'public');
+        DB::beginTransaction();
+        try {
+            $healthRecord->fill([
+                'visit_date' => $validated['visit_date'] ?? $healthRecord->visit_date,
+                'title' => $validated['title'] ?? $healthRecord->title,
+                'diagnosis' => $validated['diagnosis'] ?? $healthRecord->diagnosis,
+                'treatment' => $validated['treatment'] ?? $healthRecord->treatment,
+            ]);
+
+            // remove specific attachments if requested
+            if (!empty($validated['remove_attachments'])) {
+                $remove = $validated['remove_attachments'];
+                $healthRecord->attachments = array_values(array_filter($healthRecord->attachments ?? [], function ($p) use ($remove) {
+                    return !in_array($p, $remove);
+                }));
             }
+
+            if ($request->hasFile('attachments')) {
+                $paths = $healthRecord->attachments ?? [];
+                foreach ($request->file('attachments') as $file) {
+                    $paths[] = $file->store('health-records', 'public');
+                }
+                $healthRecord->attachments = $paths;
+            }
+
+            $healthRecord->save();
+
+            DB::commit();
+
+            return back()->with('success', 'Health record updated.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Health record update failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to update health record.');
         }
-
-        $healthRecord->update(array_merge($data, ['attachments' => $attachments]));
-
-        return redirect()->back()->with('success', 'Record updated.');
     }
 
+    /**
+     * Vet: delete a health record
+     */
     public function destroy(HealthRecord $healthRecord)
     {
-        $this->authorize('delete', $healthRecord);
+        Gate::authorize('delete', $healthRecord);
 
-        // Optionally remove attachments (left simple)
-        $healthRecord->delete();
+        try {
+            // delete attachments files
+            foreach ($healthRecord->attachments ?? [] as $path) {
+                Storage::disk('public')->delete($path);
+            }
 
-        return redirect()->back()->with('success', 'Record deleted.');
+            $healthRecord->delete();
+
+            return back()->with('success', 'Health record removed.');
+        } catch (\Throwable $e) {
+            Log::error('Health record delete failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to delete health record.');
+        }
     }
 }

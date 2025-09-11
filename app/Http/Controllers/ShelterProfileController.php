@@ -13,14 +13,14 @@ class ShelterProfileController extends Controller
     use AuthorizesRequests;
     public function show(Request $request, ShelterProfile $shelterProfile)
     {
-        $this->authorize('view', $shelterProfile);
+        Gate::authorize('view', $shelterProfile);
         $shelterProfile->load('user', 'user.reviews');
         return Inertia::render('Shelters/Show', ['profile' => $shelterProfile]);
     }
 
     public function update(Request $request, ShelterProfile $shelterProfile)
     {
-        $this->authorize('update', $shelterProfile);
+        Gate::authorize('update', $shelterProfile);
 
         $data = $request->validate([
             'location' => 'nullable|string|max:255',

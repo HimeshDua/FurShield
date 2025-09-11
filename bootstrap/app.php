@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'redirect.role' => \App\Http\Middleware\RedirectByRole::class,
             'appearance' => \App\Http\Middleware\HandleAppearance::class,
         ]);
     })

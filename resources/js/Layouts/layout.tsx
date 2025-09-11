@@ -1,5 +1,4 @@
 import FooterWithNewsletter from '@/components/footer/default';
-import { Banner } from '@/components/ui/banner';
 import { Section } from '@/components/ui/section';
 import { Toaster } from '@/components/ui/sonner';
 import { LayoutProps, PageProps } from '@/types';
@@ -19,7 +18,7 @@ function Layout({ children, title }: LayoutProps) {
     }, [flash]);
     return (
         <>
-            {auth.user && auth.user.email.length > 0 && <Banner className="bg-gradient-to-b from-blue-500 to-blue-600" />}
+            {/* {auth.user && auth.user.email.length > 0 && <Banner className="bg-gradient-to-b from-blue-500 to-blue-600" />} */}
             {/* <main className="relative mx-auto max-w-7   xl"> */}
             <Head title={title} />
             <Navbar auth={auth} />
