@@ -20,7 +20,7 @@ class DashboardController extends Controller
         $userId = Auth::user()->id;
         $isPet = Pet::where('owner_id', $userId)->first();
         if (!$isPet) {
-            return redirect('')->with('error', 'Submit Details about your Pet to view dashboard');
+            return redirect()->route('owner.pets.create')->with('error', 'Submit Details about your Pet to view dashboard');
         }
         $user = $request->user();
 

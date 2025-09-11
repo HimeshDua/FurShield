@@ -81,12 +81,35 @@ export interface Auth {
 // ---------- Domain Entities ----------
 
 // Pets
+export interface PetwithAppointment {
+    id: number;
+    name: string;
+    species: string;
+    breed?: string;
+    age?: number;
+    images: {
+        image: string;
+        path: string;
+    }[];
+    appointments: Appointment[];
+    health_records: HealthRecord[];
+    owner_id: number;
+    created_at: string;
+    updated_at: string;
+    [key: string]: any;
+}
+
 export interface Pet {
     id: number;
     name: string;
     species: string;
     breed?: string;
     age?: number;
+    images: {
+        image: string;
+        path: string;
+    }[];
+    health_records: HealthRecord[];
     owner_id: number;
     created_at: string;
     updated_at: string;
@@ -154,6 +177,14 @@ export interface ShelterProfile {
     updated_at: string;
 }
 
+export interface Order {
+    owner_id: string;
+    total_amount: string;
+    status: string;
+    order_date: date;
+    metadata: string;
+}
+
 export interface PageProps extends InertiaPageProps {
     auth: {
         user?: User | null;
@@ -163,6 +194,8 @@ export interface PageProps extends InertiaPageProps {
     product: Product;
     appointment: Appointment;
     pet: Pet;
+    orders: Order;
+    petwithAppointment: PetwithAppointment;
     [key: string]: any;
 }
 

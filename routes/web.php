@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
-use App\Http\Controllers\PetController;
 use App\Http\Controllers\HealthRecordController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ProductController;
@@ -26,6 +25,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +37,7 @@ Route::get('/', function () {
     return Inertia::render('Public/Home');
 })->name('home');
 
-Route::get('/about', fn() => Inertia::render('Public/About'))->name('about');
+// Route::get('/about', fn() => Inertia::render('Public/About'))->name('about');
 // Route::get('/contact', fn () => Inertia::render('Public/Contact'))->name('contact');
 // Route::get('/services', fn () => Inertia::render('Public/Services'))->name('services');
 
@@ -115,7 +115,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('appointments.book');
 
         // Orders (demo checkout)
-        Route::resource('orders', OrderController::class)->only(['index', 'show', 'store']);
+        Route::resource('orders', OrderController::class)->only(['index', 'show', 'store', 'create']);
     });
 
     /*
@@ -123,13 +123,17 @@ Route::middleware(['auth'])->group(function () {
     | VET ROUTES (role:vet)
     |--------------------------------------------------------------------------
     */
+
     Route::middleware('role:vet')->prefix('vet')->name('vet.')->group(function () {
         // Vet appointment calendar/list
         Route::get('appointments', [AppointmentController::class, 'vetIndex'])
             ->name('appointments.index');
 
         // Approve, reschedule, cancel appointment (actions)
-        Route::patch('appointments/{appointment}/approve', [AppointmentController::class, 'approve'])
+        Route::patch('appointments/{appointment}/approve', [
+            AppointmentController::class,
+            'approve'
+        ])
             ->name('appointments.approve');
         Route::patch('appointments/{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
             ->name('appointments.reschedule');

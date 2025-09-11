@@ -62,9 +62,8 @@ class PetController extends Controller
         Gate::authorize('view', $pet);
 
         $pet->load(['images', 'healthRecords', 'appointments']);
-
         return Inertia::render('Owner/Pets/Show', [
-            'pet' => $pet
+            'petwithAppointment' => $pet
         ]);
     }
 

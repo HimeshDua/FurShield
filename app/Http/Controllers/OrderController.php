@@ -33,6 +33,12 @@ class OrderController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        $products = Product::all(); // or maybe with pagination? but for demo, all is fine
+        return Inertia::render('Owner/Orders/Create', ['products' => $products]);
+    }
+
     /**
      * Show order details
      */
