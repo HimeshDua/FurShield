@@ -81,7 +81,6 @@ class AdoptionListingController extends Controller
             'images.*'    => 'nullable|image|max:4096',
         ]);
 
-        // Merge existing + new images
         $images = $adoption->images ?? [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {

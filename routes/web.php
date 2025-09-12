@@ -103,9 +103,10 @@ Route::middleware(['auth'])->group(function () {
 
     /// fix edit things adoption and products
     Route::middleware('role:shelter')->prefix('shelter')->name('shelter.')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\Shelter\DashboardController::class, 'index'])
+            ->name('dashboard');
+
         Route::resource('adoptions', AdoptionListingController::class);
-        // ->only(['create', 'store', 'update', 'destroy']);
-        // Route::resource('shelter-profile', ShelterProfileController::class)->only(['show', 'update']);
         Route::resource('products', ShelterProductController::class);
     });
 
