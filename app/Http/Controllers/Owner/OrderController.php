@@ -3,63 +3,41 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
+use App\Models\OwnerTransaction;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class OrderController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
+
     public function index()
     {
-        //
+        $owner_id = Auth::id();
+        $transactions = OwnerTransaction::with('product')
+            ->where('owner_id', $owner_id)
+            ->latest()
+            ->paginate(10);
+
+        return Inertia::render('Owner/Orders/Index', [
+            'orders' => $transactions
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(OwnerTransaction $transaction)
     {
-        //
-    }
+        $this->authorize('view', $transaction);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $transaction->load('product');
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return Inertia::render('Owner/Orders/Show', [
+            'order' => $transaction
+        ]);
     }
 }

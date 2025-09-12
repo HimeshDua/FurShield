@@ -21,20 +21,14 @@ class HealthRecord extends Model
 
     protected $casts = [
         'visit_date' => 'date',
-        'attachments' => 'array', // will automatically decode/encode JSON
+        'attachments' => 'array',
     ];
 
-    /**
-     * Relationship: A health record belongs to a pet.
-     */
     public function pet()
     {
         return $this->belongsTo(Pet::class);
     }
 
-    /**
-     * Relationship: A health record may be created by/linked to a vet (user).
-     */
     public function vet()
     {
         return $this->belongsTo(User::class, 'vet_id');

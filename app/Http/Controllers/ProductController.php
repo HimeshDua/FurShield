@@ -24,7 +24,7 @@ class ProductController extends Controller
         //     'products' => $products ?? [],
         // ]);
 
-        return Inertia::render('Shelter/Products/Index' , [
+        return Inertia::render('Shelter/Products/Index', [
             'products' => $products ?? []
         ]);
     }

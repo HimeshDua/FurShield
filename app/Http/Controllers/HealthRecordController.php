@@ -25,7 +25,7 @@ class HealthRecordController extends Controller
     public function indexForPet(Request $request, Pet $pet)
     {
         // ensure owner owns the pet
-        Gate::authorize('view', $pet);
+        // Gate::authorize('view', $pet);
 
         $records = HealthRecord::where('pet_id', $pet->id)
             ->with('vet')
@@ -33,17 +33,43 @@ class HealthRecordController extends Controller
             ->paginate(20);
 
         return Inertia::render('Owner/Pets/Health/Index', [
-            'pet' => $pet,
-            'records' => $records,
+            'pet' => $pet ?? [],
+            'records' => $records ?? [],
         ]);
     }
+
+    public function create(Pet $pet)
+    {
+        // Optionally authorize owner or vet depending on your rules
+        // Gate::authorize('view', $pet);
+
+        return Inertia::render('Owner/Pets/Health/Create', [
+            'pet' => $pet,
+        ]);
+    }
+
+    /**
+     * Vet: show edit form for a health record
+     */
+    public function edit(Pet $pet, HealthRecord $healthRecord)
+    {
+        Gate::authorize('update', $healthRecord);
+
+        return Inertia::render('Owner/Pets/Health/Edit', [
+            'record' => $healthRecord->load('vet'),
+            'pet' => $pet,
+        ]);
+    }
+
+
+
 
     /**
      * Vet: store a new health record (vet-only route)
      */
     public function store(Request $request)
     {
-        Gate::authorize('create', HealthRecord::class);
+        // Gate::authorize('create', HealthRecord::class);
 
         $validated = $request->validate([
             'pet_id' => 'required|integer|exists:pets,id',
@@ -54,35 +80,27 @@ class HealthRecordController extends Controller
             'attachments.*' => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:8192',
         ]);
 
-        DB::beginTransaction();
-        try {
-            $record = HealthRecord::create([
-                'pet_id' => $validated['pet_id'],
-                'vet_id' => $request->user()->id,
-                'visit_date' => $validated['visit_date'],
-                'title' => $validated['title'] ?? null,
-                'diagnosis' => $validated['diagnosis'] ?? null,
-                'treatment' => $validated['treatment'] ?? null,
-            ]);
+        $record = HealthRecord::create([
+            'pet_id' => $validated['pet_id'],
+            'vet_id' => $request->user()->id,
+            'visit_date' => $validated['visit_date'],
+            'title' => $validated['title'] ?? null,
+            'diagnosis' => $validated['diagnosis'] ?? null,
+            'treatment' => $validated['treatment'] ?? null,
+        ]);
 
-            if ($request->hasFile('attachments')) {
-                $paths = [];
-                foreach ($request->file('attachments') as $file) {
-                    $paths[] = $file->store('health-records', 'public');
-                }
-                // store as JSON array in a attachments text field (or related model)
-                $record->attachments = $paths;
-                $record->save();
+        if ($request->hasFile('attachments')) {
+            $paths = [];
+            foreach ($request->file('attachments') as $file) {
+                $paths[] = $file->store('health-records', 'public');
             }
 
-            DB::commit();
-
-            return back()->with('success', 'Health record added.');
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            Log::error('Health record store failed: ' . $e->getMessage());
-            return back()->with('error', 'Failed to save health record.');
+            $record->attachments = $paths;
+            $record->save();
         }
+
+
+        return back()->with('success', 'Health record added.');
     }
 
     /**

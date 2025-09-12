@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
@@ -138,7 +138,18 @@ export default function PetShow() {
                                     </TableBody>
                                 </Table>
                             ) : (
-                                <div className="py-6 text-center text-muted-foreground">No health records found.</div>
+                                <Card>
+                                    <CardContent className="grid-row grid items-center justify-center">
+                                        <CardTitle>
+                                            <div className="py-6 text-center text-muted-foreground">No health records found.</div>
+                                        </CardTitle>
+                                        <CardDescription>
+                                            <Button>
+                                                <Link href={route('owner.pets.health.create', pet.slug)}>Add Health Details</Link>
+                                            </Button>
+                                        </CardDescription>
+                                    </CardContent>
+                                </Card>
                             )}
                         </CardContent>
                     </Card>

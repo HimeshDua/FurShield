@@ -1,4 +1,3 @@
-import ProductsComponent from '@/components/products/default';
 import Layout from '@/layouts/layout';
 import { router, usePage } from '@inertiajs/react';
 
@@ -11,8 +10,8 @@ export default function ProductsIndex() {
     };
     return (
         <Layout title="Products Page">
-            \ hello
-            {/* <ProductsComponent products={products} onPageChange={handlePageChange} /> */}
+            dsds
+            {/* <ProductsComponent products={products} /> */}
         </Layout>
     );
 }

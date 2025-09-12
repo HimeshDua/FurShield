@@ -29,6 +29,7 @@ use App\Http\Controllers\VetProfileController;
 Route::get('/', fn() => Inertia::render('Public/Home'))->name('home');
 
 // Public browse
+Route::get('products', [PublicProductController::class, 'index'])->name('products.index');
 Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('vets', [VetProfileController::class, 'index'])->name('vets.index');
 Route::get('vets/{vet}', [VetProfileController::class, 'show'])->name('vets.show');
@@ -63,11 +64,25 @@ Route::middleware(['auth'])->group(function () {
         Route::get('pets/{pet}/health', [HealthRecordController::class, 'indexForPet'])
             ->name('pets.health.index');
 
-        Route::post('appointments/{pet}', [AppointmentController::class, 'bookForPet'])
-            ->name('appointments.book');
+        Route::get('pets/{pet}/health/create', [HealthRecordController::class, 'create'])
+            ->name('pets.health.create');
+
+        Route::post('pets/{pet}/health', [HealthRecordController::class, 'store'])
+            ->name('pets.health.store');
+
+        Route::get('pets/{pet}/health/{healthRecord}/edit', [HealthRecordController::class, 'edit'])
+            ->name('pets.health.edit');
+
+        Route::patch('pets/{pet}/health/{healthRecord}', [HealthRecordController::class, 'update'])
+            ->name('pets.health.update');
+
+        Route::delete('pets/{pet}/health/{healthRecord}', [HealthRecordController::class, 'destroy'])
+            ->name('pets.health.destroy');
+
+        Route::post('appointments/{pet}', [AppointmentController::class, 'bookForPet'])->name('appointments.book');
 
         // Optional: enable orders
-        Route::resource('orders', OrderController::class)->only(['index', 'show', 'store', 'create']);
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     });
 
     /*

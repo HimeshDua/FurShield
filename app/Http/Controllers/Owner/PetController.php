@@ -28,6 +28,7 @@ class PetController extends Controller
         return Inertia::render('Owner/Pets/Create');
     }
 
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -55,7 +56,8 @@ class PetController extends Controller
             }
         }
 
-        return redirect()->route('owner.pets.index')->with('success', 'Pet added.');
+        return redirect()->route('owner.pets.health.create', $pet->slug)->with('success', 'Add Health Details To Procsed');
+        // return redirect()->route('owner.pets.index')->with('success', 'Pet added.');
     }
 
     public function show(Pet $pet)
