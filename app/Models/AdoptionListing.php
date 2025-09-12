@@ -41,19 +41,19 @@ class AdoptionListing extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->slug = static::generateUniqueSlug($model->name);
+            $model->slug = static::generateUniqueSlug($model->pet_name);
         });
 
         static::updating(function ($model) {
-            if ($model->isDirty('name')) {
-                $model->slug = static::generateUniqueSlug($model->name);
+            if ($model->isDirty('pet_name')) {
+                $model->slug = static::generateUniqueSlug($model->pet_name);
             }
         });
     }
 
-    protected static function generateUniqueSlug($name)
+    protected static function generateUniqueSlug($pet_name)
     {
-        $slug = Str::slug($name);
+        $slug = Str::slug($pet_name);
         $count = static::where('slug', 'like', "{$slug}%")->count();
         return $count ? "{$slug}-{$count}" : $slug;
     }

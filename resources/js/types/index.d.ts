@@ -147,6 +147,20 @@ export interface Product {
     // onPageChange: (url: string | null) => void;
 }
 
+export interface Adoption {
+    id?: number;
+    pet_name?: string;
+    species?: string;
+    slug: string;
+    breed?: string | null;
+    age?: string | null;
+    status?: 'available' | 'pending' | 'adopted';
+    description?: string | null;
+    images?: Array<string | { path: string; id?: string }>;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface HealthRecord {
     id: number;
     pet_id: number;

@@ -46,14 +46,14 @@ export default function Index() {
                                     <TableCell className="capitalize">{adoption.status}</TableCell>
                                     <TableCell className="space-x-2">
                                         <Button size="sm" variant="outline" asChild>
-                                            <Link href={route('shelter.adoptions.edit', adoption.id)}>Edit</Link>
+                                            <Link href={route('shelter.adoptions.edit', adoption.slug)}>Edit</Link>
                                         </Button>
                                         <Button
                                             size="sm"
                                             variant="destructive"
                                             onClick={() => {
                                                 if (!confirm('Delete this listing? This action cannot be undone.')) return;
-                                                router.delete(route('shelter.adoptions.destroy', adoption.id));
+                                                router.delete(route('shelter.adoptions.destroy', adoption.slug));
                                             }}
                                         >
                                             Delete

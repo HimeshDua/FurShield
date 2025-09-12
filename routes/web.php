@@ -65,6 +65,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('pets/{pet}/health/{healthRecord}/edit', [HealthRecordController::class, 'edit'])
             ->name('pets.health.edit');
 
+        Route::get('pets/{pet}/health/{healthRecord}/edit', [HealthRecordController::class, 'edit'])
+            ->name('pets.health.show');
+
         Route::patch('pets/{pet}/health/{healthRecord}', [HealthRecordController::class, 'update'])
             ->name('pets.health.update');
 
@@ -97,9 +100,12 @@ Route::middleware(['auth'])->group(function () {
     | Shelter routes
     |--------------------------------------------------------------------------
     */
+
+    /// fix edit things adoption and products
     Route::middleware('role:shelter')->prefix('shelter')->name('shelter.')->group(function () {
         Route::resource('adoptions', AdoptionListingController::class);
-        Route::resource('shelter-profile', ShelterProfileController::class)->only(['show', 'update']);
+        // ->only(['create', 'store', 'update', 'destroy']);
+        // Route::resource('shelter-profile', ShelterProfileController::class)->only(['show', 'update']);
         Route::resource('products', ShelterProductController::class);
     });
 

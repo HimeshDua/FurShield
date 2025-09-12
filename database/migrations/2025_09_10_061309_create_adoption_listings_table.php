@@ -12,6 +12,7 @@ class CreateAdoptionListingsTable extends Migration
             $table->id();
             $table->foreignId('shelter_id')->constrained('users')->cascadeOnDelete();
             $table->string('pet_name');
+            $table->string('slug')->unique();
             $table->string('species');
             $table->string('breed')->nullable();
             $table->string('age')->nullable();

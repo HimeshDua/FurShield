@@ -1,5 +1,4 @@
-<?php
-
+<!-- 
 namespace App\Http\Controllers;
 
 use App\Models\AdoptionListing;
@@ -74,4 +73,4 @@ class AdoptionListingController extends Controller
         $adoption->delete();
         return redirect()->route('adoptions.index')->with('success', 'Listing removed.');
     }
-}
+} -->

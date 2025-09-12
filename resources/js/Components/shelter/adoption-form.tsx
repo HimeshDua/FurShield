@@ -4,23 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Adoption } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import clsx from 'clsx';
 import { Upload, X } from 'lucide-react';
-import React, { useRef, useState } from 'react';
-
-type Adoption = {
-    id?: number;
-    pet_name?: string;
-    species?: string;
-    breed?: string | null;
-    age?: string | null;
-    status?: 'available' | 'pending' | 'adopted';
-    description?: string | null;
-    images?: Array<string | { path: string; id?: string }>;
-    created_at?: string;
-    updated_at?: string;
-};
+import React, { useEffect, useRef, useState } from 'react';
 
 type AdoptionFormProps = {
     adoption?: Adoption;
@@ -29,7 +17,7 @@ type AdoptionFormProps = {
 };
 
 export default function AdoptionForm({ adoption, submitUrl, method }: AdoptionFormProps) {
-    // normalize existing images to paths
+    // Normalize existing images to paths
     const existingImages: string[] = (adoption?.images || []).map((i) => (typeof i === 'string' ? i : (i as any).path));
 
     const [imagePreviews, setImagePreviews] = useState<string[]>(existingImages.map((p) => `/storage/${p}`));
@@ -44,9 +32,33 @@ export default function AdoptionForm({ adoption, submitUrl, method }: AdoptionFo
         age: adoption?.age || '',
         status: adoption?.status || 'available',
         description: adoption?.description || '',
-        images: [] as File[], // newly added files
-        deleted_images: [] as string[], // store paths of existing images to delete
+        images: [] as File[],
+        deleted_images: [] as string[],
+        // For edit mode, include the adoption ID if it exists
+        ...(adoption?.id && { id: adoption.id }),
     });
+
+    // When the adoption prop changes (in edit mode), update the form data
+    useEffect(() => {
+        if (adoption) {
+            setData({
+                pet_name: adoption.pet_name || '',
+                species: adoption.species || '',
+                breed: adoption.breed || '',
+                age: adoption.age || '',
+                status: adoption.status || 'available',
+                description: adoption.description || '',
+                images: [],
+                deleted_images: [],
+                // Preserve the adoption ID for updates
+                ...(adoption.id && { id: adoption.id }),
+            });
+
+            // Reset image previews with existing images
+            setImagePreviews(existingImages.map((p) => `/storage/${p}`));
+        }
+        console.log(adoption);
+    }, [adoption]);
 
     const triggerFileInput = () => fileInputRef.current?.click();
 
@@ -83,26 +95,25 @@ export default function AdoptionForm({ adoption, submitUrl, method }: AdoptionFo
     };
 
     const removeImage = (index: number) => {
-        // If index is in existing images range -> mark for deletion using original path
         if (index < existingCount) {
             const path = existingImages[index];
             setData('deleted_images', [...data.deleted_images, path]);
         } else {
-            // Remove newly added file
             const newFiles = [...data.images];
             const newIndex = index - existingCount;
             if (newIndex >= 0 && newIndex < newFiles.length) {
-                // revoke object URL for memory cleanup (if created)
-                (newFiles[newIndex] as any) && URL.revokeObjectURL((newFiles[newIndex] as any).preview);
+                URL.revokeObjectURL(imagePreviews[index]);
                 newFiles.splice(newIndex, 1);
                 setData('images', newFiles);
             }
         }
 
-        // Remove preview image
         setImagePreviews((prev) => {
             const copy = [...prev];
-            copy.splice(index, 1);
+            const removed = copy.splice(index, 1);
+            if (index >= existingCount) {
+                URL.revokeObjectURL(removed[0]);
+            }
             return copy;
         });
     };
@@ -110,40 +121,28 @@ export default function AdoptionForm({ adoption, submitUrl, method }: AdoptionFo
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Build multipart form data
-        const formData = new FormData();
-        formData.append('pet_name', data.pet_name);
-        formData.append('species', data.species);
-        formData.append('breed', data.breed || '');
-        formData.append('age', data.age || '');
-        formData.append('status', data.status || 'available');
-        formData.append('description', data.description || '');
-
-        // new images
-        data.images.forEach((file) => {
-            formData.append('images[]', file);
-        });
-
-        // deleted existing images (paths)
-        data.deleted_images.forEach((path) => {
-            formData.append('deleted_images[]', path);
-        });
-
-        if (method === 'post') {
+        if (method === 'put') {
+            put(submitUrl, {
+                data,
+                forceFormData: true,
+                onSuccess: () => {
+                    router.visit(route('shelter.adoptions.index'), { preserveScroll: true });
+                },
+                onError: (errors) => {
+                    console.error('Form errors:', errors);
+                },
+            });
+        } else {
+            // For create operations
             post(submitUrl, {
-                data: formData,
+                data,
                 forceFormData: true,
                 onSuccess: () => {
                     reset();
                     router.visit(route('shelter.adoptions.index'), { preserveScroll: true });
                 },
-            });
-        } else {
-            put(submitUrl, {
-                data: formData,
-                forceFormData: true,
-                onSuccess: () => {
-                    router.visit(route('shelter.adoptions.index'), { preserveScroll: true });
+                onError: (errors) => {
+                    console.error('Form errors:', errors);
                 },
             });
         }

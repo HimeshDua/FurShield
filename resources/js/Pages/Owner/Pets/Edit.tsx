@@ -9,7 +9,6 @@ import { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { Loader2Icon } from 'lucide-react';
 
-// Pet Edit Page
 export default function PetEdit() {
     const { pet } = usePage<PageProps>().props;
 
@@ -37,19 +36,19 @@ export default function PetEdit() {
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        put(route('owner.pets.update', pet.id));
+        put(route('owner.pets.update', pet.slug));
     };
 
     return (
         <DashboardLayout title={`Edit ${pet.name}`}>
-            <div className="py-6">
-                <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                    <Card>
+            <div className="py-8">
+                <div className="mx-auto max-w-6xl sm:px-6 lg:px-8">
+                    <Card className="border-border bg-card shadow-lg">
                         <CardHeader>
-                            <CardTitle>Edit {pet.name}</CardTitle>
+                            <CardTitle className="text-2xl font-semibold text-primary">Edit {pet.name}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                            <form onSubmit={handleSubmit} className="space-y-8">
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     <div className="space-y-2">
                                         <Label htmlFor="name" className={errors.name ? 'text-destructive' : ''}>
@@ -135,12 +134,12 @@ export default function PetEdit() {
                                 </div>
 
                                 <div className="flex justify-end space-x-4">
-                                    <Link href={route('owner.pets.show', pet.id)}>
-                                        <Button type="button" variant="outline">
+                                    <Link href={route('owner.pets.show', pet.slug)}>
+                                        <Button type="button" variant="outline" className="bg-secondary text-secondary-foreground">
                                             Cancel
                                         </Button>
                                     </Link>
-                                    <Button type="submit" disabled={processing}>
+                                    <Button type="submit" disabled={processing} className="bg-primary text-primary-foreground">
                                         {processing ? (
                                             <>
                                                 <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />

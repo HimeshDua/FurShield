@@ -36,12 +36,12 @@ export default function Index() {
                                 <TableCell>{product.stock_quantity}</TableCell>
                                 <TableCell className="space-x-2">
                                     <Button size="sm" variant="outline" asChild>
-                                        <Link href={route('shelter.products.edit', product.id)}>Edit</Link>
+                                        <Link href={route('shelter.products.edit', product.slug)}>Edit</Link>
                                     </Button>
                                     <Button
                                         size="sm"
                                         variant="destructive"
-                                        onClick={() => router.delete(route('shelter.products.destroy', product.id))}
+                                        onClick={() => router.delete(route('shelter.products.destroy', product.slug))}
                                     >
                                         Delete
                                     </Button>
