@@ -1,24 +1,20 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\HealthRecordController;
 use App\Http\Controllers\Owner\AppointmentController;
 use App\Http\Controllers\Owner\OrderController;
-use App\Http\Controllers\Owner\ProductController;
 use App\Http\Controllers\Owner\PetController;
 use App\Http\Controllers\Public\ProductController as PublicProductController;
-use App\Http\Controllers\Shared\ProfileController;
 use App\Http\Controllers\Shelter\AdoptionListingController;
+use App\Http\Controllers\Shelter\ProductController as ShelterProductController;
 use App\Http\Controllers\Shelter\ShelterProfileController;
 use App\Http\Controllers\ShelterController;
 use App\Http\Controllers\VetProfileController;
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +26,7 @@ Route::get('/', fn() => Inertia::render('Public/Home'))->name('home');
 
 // Public browse
 Route::get('products', [PublicProductController::class, 'index'])->name('products.index');
-Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('products/{product}', [PublicProductController::class, 'show'])->name('products.show');
 Route::get('vets', [VetProfileController::class, 'index'])->name('vets.index');
 Route::get('vets/{vet}', [VetProfileController::class, 'show'])->name('vets.show');
 Route::get('adoptions', [AdoptionListingController::class, 'index'])->name('adoptions.index');
@@ -46,10 +42,6 @@ require __DIR__ . '/settings.php';
 */
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['redirect.role'])->get('/dashboard', fn() => null)->name('dashboard');
-
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     /*
     |--------------------------------------------------------------------------
@@ -108,7 +100,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('role:shelter')->prefix('shelter')->name('shelter.')->group(function () {
         Route::resource('adoptions', AdoptionListingController::class);
         Route::resource('shelter-profile', ShelterProfileController::class)->only(['show', 'update']);
-        Route::resource('products', ProductController::class);
+        Route::resource('products', ShelterProductController::class);
     });
 
     /*
@@ -116,7 +108,7 @@ Route::middleware(['auth'])->group(function () {
     | Shared auth routes
     |--------------------------------------------------------------------------
     */
-    Route::post('products/{product}/reviews', [ProductController::class, 'review'])->name('products.review');
+    Route::post('products/{product}/reviews', [ShelterProductController::class, 'review'])->name('products.review');
     Route::post('adoptions/{adoption}/interest', [AdoptionListingController::class, 'expressInterest'])->name('adoptions.interest');
 });
 
@@ -124,11 +116,12 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 | Admin routes
 |--------------------------------------------------------------------------
-// */
-// Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-//     Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-//     Route::resource('users', UserManagementController::class)->only(['index', 'edit', 'update', 'destroy']);
-// });
+*/
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('users', UserManagementController::class)->only(['index', 'edit', 'update', 'destroy']);
+});
 
 /*
 |--------------------------------------------------------------------------

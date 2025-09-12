@@ -17,7 +17,7 @@ class CreateAdoptionListingsTable extends Migration
             $table->string('age')->nullable();
             $table->enum('status', ['available', 'pending', 'adopted'])->default('available');
             $table->text('description')->nullable();
-            $table->json('images')->nullable(); // quick array of paths for hackathon
+            $table->json('images')->nullable();
             $table->timestamps();
             $table->index(['shelter_id', 'status']);
         });

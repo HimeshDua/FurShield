@@ -121,9 +121,20 @@ export interface Pet {
 export interface Product {
     id: number;
     name: string;
+    slug: string;
     description: string;
+    category: string;
     price: number;
-    stock?: number;
+    images: {
+        id: string;
+        alt: null | string;
+        is_primary: 0 | 1;
+        path: string;
+        product_id: string;
+        updated_at: string;
+        created_at: string;
+    }[];
+    stock_quantity?: number;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;

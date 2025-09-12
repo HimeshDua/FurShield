@@ -45,7 +45,6 @@ class PetController extends Controller
 
         $pet = Pet::create(array_merge($data, ['owner_id' => $request->user()->id]));
 
-        // handle images quickly for hackathon
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
                 $path = $file->store('pet_images', 'public');

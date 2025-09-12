@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import Layout from '@/layouts/layout';
+import { PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 
 export default function ProductShow() {
-    const props = usePage().props as any;
-    const product = props.product;
-
+    const { product } = usePage<PageProps>().props;
+    console.log(product);
     return (
         <Layout title="Products Page">
             <div className="mx-auto max-w-4xl py-8">

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Gate;
 
 class PetController extends Controller
 {
+
+    // shit controller i guess
     use AuthorizesRequests;
     public function index(Request $request)
     {

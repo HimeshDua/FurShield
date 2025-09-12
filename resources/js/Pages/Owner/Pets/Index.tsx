@@ -10,6 +10,7 @@ import { PlusIcon } from 'lucide-react';
 export default function PetIndex() {
     const { pet: pets } = usePage().props;
 
+    console.log(pets);
     return (
         <DashboardLayout title="My Pets">
             <div className="py-6">

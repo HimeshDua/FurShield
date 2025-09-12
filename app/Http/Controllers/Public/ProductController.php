@@ -10,14 +10,21 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+
     public function index()
     {
-        $user_id = Auth::user()->id;
-        $products = Product::where('vendor_id', $user_id)->get();
-        // ->paginate(10);
+        $products = Product::latest()->paginate(10);
+        return Inertia::render('Public/Products/Index', [
+            'products' => $products,
+        ]);
+    }
 
-        return Inertia::render('Products/Index', [
-            'products' => $products ?? []
+    public function show(Product $product)
+    {
+        // Gate::authorize('view', $pet);
+        $product->load(['images', 'shelter', 'reviews']);
+        return Inertia::render('Public/Products/Show', [
+            'product' => $product
         ]);
     }
 }
