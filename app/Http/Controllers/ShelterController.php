@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Gate;
 
-class ShelterProfileController extends Controller
+class ShelterController extends Controller
 {
     use AuthorizesRequests;
     public function show(Request $request, ShelterProfile $shelterProfile)

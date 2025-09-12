@@ -83,6 +83,7 @@ export interface Auth {
 // Pets
 export interface PetwithAppointment {
     id: number;
+    slug: string;
     name: string;
     species: string;
     breed?: string;
@@ -101,6 +102,7 @@ export interface PetwithAppointment {
 
 export interface Pet {
     id: number;
+    slug: string;
     name: string;
     species: string;
     breed?: string;

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -12,20 +11,14 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    use AuthorizesRequests;
-
     public function index()
     {
         $products = Product::where('vendor_id', Auth::id())
             ->latest()
             ->paginate(10);
 
-        // return Inertia::render('Shelter/Products/Index', [
-        //     'products' => $products ?? [],
-        // ]);
-
-        return Inertia::render('Shelter/Products/Index' , [
-            'products' => $products ?? []
+        return Inertia::render('Shelter/Products/Index', [
+            'products' => $products,
         ]);
     }
 

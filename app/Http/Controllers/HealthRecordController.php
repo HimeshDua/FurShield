@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HealthRecord;
 use App\Models\Pet;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
@@ -13,10 +14,10 @@ use Illuminate\Support\Facades\Log;
 
 class HealthRecordController extends Controller
 {
-    public function __construct()
-    {
-        Gate::middleware('auth');
-    }
+    // public function __construct()
+    // {
+    //     Gate::middleware('auth');
+    // }
 
     /**
      * Owner: list health records for a given pet (timeline).

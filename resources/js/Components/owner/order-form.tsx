@@ -4,11 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { Product } from '@/types';
+import { Order } from '@/types';
 import { Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function OrderCreateForm({ products }: { products: Product }) {
+export default function OrderCreateForm({ orders }: { orders: Order[] }) {
     const [items, setItems] = useState([{ product_id: '', quantity: 1 }]);
 
     const { data, setData, post, processing } = useForm({
@@ -69,7 +69,7 @@ export default function OrderCreateForm({ products }: { products: Product }) {
                                                     <SelectValue placeholder="Select a product" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {products.map((product) => (
+                                                    {orders.map((product) => (
                                                         <SelectItem key={product.id} value={product.id.toString()}>
                                                             {product.name} - ${product.price.toFixed(2)}
                                                         </SelectItem>

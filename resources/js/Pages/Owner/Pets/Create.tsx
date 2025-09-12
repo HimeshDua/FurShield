@@ -1,7 +1,7 @@
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { Link, useForm } from '@inertiajs/react';
 
-const PetCreate = () => {
+export default function PetCreate() {
     const { data, setData, errors, post, processing } = useForm({
         name: '',
         species: '',
@@ -191,6 +191,4 @@ const PetCreate = () => {
             </div>
         </DashboardLayout>
     );
-};
-
-export default PetCreate;
+}

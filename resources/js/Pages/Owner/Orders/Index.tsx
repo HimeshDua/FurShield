@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { Link } from '@inertiajs/react';
 
-const OrderIndex = ({ orders }) => {
+export default function OrderHistory({ orders }) {
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -86,6 +86,4 @@ const OrderIndex = ({ orders }) => {
             </div>
         </DashboardLayout>
     );
-};
-
-export default OrderIndex;
+}

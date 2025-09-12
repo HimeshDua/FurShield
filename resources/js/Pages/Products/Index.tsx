@@ -11,7 +11,8 @@ export default function ProductsIndex() {
     };
     return (
         <Layout title="Products Page">
-            <ProductsComponent products={products} onPageChange={handlePageChange} />
+            \ hello
+            {/* <ProductsComponent products={products} onPageChange={handlePageChange} /> */}
         </Layout>
     );
 }
