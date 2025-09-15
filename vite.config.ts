@@ -6,9 +6,6 @@ import { defineConfig } from 'vite';
 // import typography from '@tailwindcss/typography';
 
 export default defineConfig({
-       server: {
-        host: '127.0.0.1',  // Add this to force IPv4 only
-    },
     plugins: [
         laravel({
             input: ['resources/js/css/global.css', 'resources/js/app.tsx'],

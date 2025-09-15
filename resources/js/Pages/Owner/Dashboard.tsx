@@ -4,6 +4,7 @@ import Pagination from '@/Components/shared/Pagination'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import DashboardLayout from '@/layouts/dashboard-layout'
+import { Main } from '@/Layouts/main'
 import { Appointment, links, PageProps, Pet } from '@/types'
 import { Link, usePage } from '@inertiajs/react'
 import { format } from 'date-fns'
@@ -30,6 +31,8 @@ export default function OwnerDashboard() {
 
   return (
     <DashboardLayout title="Owner Dashboard">
+      <Main>
+
       <div className="mx-auto max-w-6xl py-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <ReminderPopup />
@@ -231,7 +234,8 @@ export default function OwnerDashboard() {
             </div>
           </aside>
         </div>
-      </div>
+        </div>
+      </Main>
     </DashboardLayout>
   )
 }
