@@ -119,17 +119,16 @@ export default function PetShow() {
                                             <TableCell>{new Date(record.visit_date).toLocaleDateString()}</TableCell>
                                             <TableCell>{record?.title}</TableCell>
                                             <TableCell>{record.diagnosis}</TableCell>
-                                            <TableCell>{record.treatment}</TableCell>
-                                            <TableCell><Link href={`/${record.attachments}`}>View Attachment</Link></TableCell>
+                                        <TableCell>{record.treatment}</TableCell>
+                                            <TableCell><a className='underline' target='_blank' href={`/storage/${record.attachments}`}>View Attachment</a></TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
                         ) : (
                             <CardDescription className="py-6 text-center">No health records found.</CardDescription>
-                        )}
-                        {/* Add pagination links here if needed */}
-                    </CardContent>
+              )}
+            </CardContent>
                 </Card>
 
                 {/* Appointments */}
